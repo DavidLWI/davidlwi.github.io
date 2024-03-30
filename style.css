@@ -9,12 +9,23 @@ body {
   }
 
 .p1 {
-  font-size: 30px;
+  font-size: 40px;
   font-family: "Calibri";
+  color : rgb(0, 240, 148);
   text-shadow: 4px 2px 4px black;
   text-align: center;
   padding: 15px;
 }
+
+.p2 {
+  font-size: 35px;
+  font-family: "Calibri";
+  color : rgb(0, 240, 148);
+  text-shadow: 4px 2px 4px black;
+  text-align: center;
+  padding: 15px;
+}
+
 
 .content {
   font-size: 20px;
