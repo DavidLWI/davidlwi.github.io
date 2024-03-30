@@ -103,10 +103,9 @@ footer{
 .thumbnail>img{
   width:280px;
   box-shadow: 15px 5px 20px -3px black;
-  display: flex;
   float:left;
   margin-left: auto;
-  margin-right: auto;
+  margin-right: 18px;
 }
 
 .textblock {
