@@ -97,6 +97,10 @@ td {
   margin-right:auto;
 }
 
+.buttonblock input {
+  display: inline-block;
+}
+
 .article{
   color : rgb(221, 221, 221);
   font-size: 20px;
