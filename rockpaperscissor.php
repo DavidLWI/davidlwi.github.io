@@ -1,6 +1,5 @@
 <?php
+    $catchoice = array("rock"=>"Paper","paper"=>"Scissor","scissor"=>"Rock");
     $pchoice = $_POST["choice"];
-    if (pchoice == "Rock") {
-        echo "Mine is Paper! AHHAHAHAHAHA! YOU LOSE!!LMAOOO";
-    }
+    echo "Well, I chose {$catchoice["pchoice"]}! BRUHHH Bro cant even win a cat! LMAOOO!!!! <br> loser.";
 ?>
