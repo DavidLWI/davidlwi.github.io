@@ -6,10 +6,12 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     margin: 0;
+    font-family: "Calibri";
   }
 
 .p1 {
   font-size: 40px;
+  font-weight: bold;
   font-family: "Calibri";
   color : rgb(0, 240, 148);
   text-shadow: 4px 2px 4px black;
@@ -89,16 +91,24 @@ td {
   margin-right:auto;
 }
 
-.buttonblock{
-  text-align:center;
-  width:60%;
-  font-family:Arial;
-  margin-left:auto;
-  margin-right:auto;
+#buttonContainer{
+  text-align: right;
+  padding-right: 30px;
 }
 
-.buttonblock input {
-  display: inline-block;
+.buttons {
+  padding: 5px 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-color: #62ff77;
+  font-family: "Calibri";
+  color:#00515c;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+
+.buttons:hover{
+  background-color: rgb(242, 255, 65);
 }
 
 .article{
@@ -108,3 +118,6 @@ td {
   font-family:Calibri;
   line-height: 1.3;
 }
+
+
+
