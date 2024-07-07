@@ -84,10 +84,10 @@ function calculateCGA() {
 }
 
 function clean() {
+    prev_credits = credits;
+    prev_cga = cga;
     credits = 0;
     cga = 0;
-    prev_credits = 0;
-    prev_cga = 0;
     document.getElementById("credits_earned").value = "";
     document.getElementById("grades").value = "";
     refreshcga();
