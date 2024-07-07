@@ -29,7 +29,7 @@ function handleEnterPress(event) {
 function calculateCGA() {
     rc_credits = Math.floor(Number(document.getElementById("credits_earned").value));
     document.getElementById("credits_earned").value = "";
-    if (isNaN(rc_credits) || rc_credits == 0) {
+    if (isNaN(rc_credits) || rc_credits <= 0) {
         window.alert("Please input a valid number for credits");
         return;
     }
