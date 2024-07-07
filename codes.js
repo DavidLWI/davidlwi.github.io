@@ -83,7 +83,7 @@ function calculateCGA() {
     else window.alert("Invalid Grade/CGA");
 }
 
-function clear() {
+function clean() {
     credits = 0;
     cga = 0;
     prev_credits = 0;
