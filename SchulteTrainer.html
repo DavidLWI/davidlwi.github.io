@@ -541,12 +541,18 @@
         }
 
         .schulte-table td {
-            border: 0.0625rem solid var(--color-border);
+             border: 0.0625rem solid var(--color-border);
             text-align: center;
             font-size: clamp(1.5rem, 5vw, 2.25rem);
             font-weight: var(--font-weight-semibold);
             user-select: none;
             padding: 0;
+             width: 20%;                    /* ← NEW: Fixed width per cell */
+            aspect-ratio: 1 / 1;           /* ← IMPROVED: Now works properly */
+        }
+
+        .schulte-table tr {
+            height: 0;                     /* ← NEW: Prevent row height issues */
         }
 
         .cell-inner {
@@ -655,9 +661,11 @@
             </section>
 
             <section class="table-wrapper" aria-label="Schulte table">
+                 <div class="schulte-table-container">  <!-- ← NEW wrapper -->
                 <table class="schulte-table" aria-hidden="true">
                     <tbody id="tableBody"></tbody>
                 </table>
+                </div>
             </section>
 
             <section class="controls">
