@@ -422,10 +422,10 @@ html, body {
     els.dot.classList.toggle("on", els.fix.checked);
   }
 
-  // Restart: abandon any current round and begin a fresh timed game.
+  // Restart: abandon any current round and return to the idle Start screen.
   function onRestart() {
-    stopTimer();
-    startGame();
+    placeLabels(true);   // fresh shuffle so the next round differs
+    goIdle();
   }
 
   // ---- Events ----
