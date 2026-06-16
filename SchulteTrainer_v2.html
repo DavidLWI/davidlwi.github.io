@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f2f2f7">
+<title>Schulte Table</title>
+<style>
+:root {
+  --bg: #f2f2f7;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  overflow: hidden; overscroll-behavior: none;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  user-select: none; -webkit-user-select: none;
+  touch-action: manipulation;
+}
+#app {
+  height: 100vh; height: 100dvh;
+  display: flex; flex-direction: column;
+  padding: calc(var(--safe-t) + 8px) calc(var(--safe-r) + 10px) calc(var(--safe-b) + 8px) calc(var(--safe-l) + 10px);
+  gap: 8px;
+}
+#controls {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px 14px; flex: 0 0 auto;
+}
+.ctrl { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #333; }
+.ctrl select {
+  font-size: 15px; padding: 5px 24px 5px 8px; border-radius: 8px;
+  border: 1px solid #c7c7cc; background: #fff; color: #000;
+  -webkit-appearance: none; appearance: none; min-height: 32px;
+}
+/* iOS-style toggle switch */
+.switch { position: relative; width: 42px; height: 26px; flex: 0 0 auto; }
+.switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.slider {
+  position: absolute; inset: 0; background: #e4e4e9; border-radius: 26px;
+  transition: background .18s ease; cursor: pointer;
+}
+.slider::before {
+  content: ""; position: absolute; height: 22px; width: 22px; left: 2px; top: 2px;
+  background: #fff; border-radius: 50%; transition: transform .18s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.switch input:checked + .slider { background: #34c759; }
+.switch input:checked + .slider::before { transform: translateX(16px); }
+
+#status {
+  flex: 0 0 auto; display: flex; align-items: baseline;
+  justify-content: space-between; padding: 0 4px; gap: 10px;
+}
+#time {
+  font-variant-numeric: tabular-nums; font-weight: 700; color: #000;
+  font-size: clamp(20px, 6vw, 30px); min-width: 0;
+}
+#best {
+  font-variant-numeric: tabular-nums; font-weight: 600; color: #8e8e93;
+  font-size: 14px; text-align: right; white-space: nowrap;
+}
+#best b { color: #ff9500; font-weight: 700; }
+#best.flash b { color: #34c759; }
+
+#target {
+  flex: 0 0 auto; text-align: center; color: #000;
+  font-weight: 700; line-height: 1.1;
+  font-size: clamp(22px, 6vw, 40px);
+}
+#targetChar { color: #007aff; }
+
+#gridwrap {
+  flex: 1 1 auto; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 0;
+}
+#grid {
+  position: relative;
+  display: grid; gap: 4px;
+  background: #d0d0d5; padding: 4px; border-radius: 12px;
+}
+.cell {
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border-radius: 7px; color: #000;
+  font-weight: 600; overflow: hidden; line-height: 1;
+}
+#dot {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #00c853; opacity: .85; pointer-events: none;
+  z-index: 10; display: none;
+}
+#dot.on { display: block; }
+
+#found {
+  flex: 0 0 auto; min-height: 52px; margin-top: 16px;
+  border: none; border-radius: 14px;
+  background: #007aff; color: #fff;
+  font-size: 20px; font-weight: 700;
+  transition: transform .06s ease, background .12s ease;
+  cursor: pointer;
+}
+#found:active { transform: scale(.97); background: #0062cc; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="controls">
+    <label class="ctrl">Size
+      <select id="size">
+        <option>2</option><option>3</option><option>4</option>
+        <option selected>5</option><option>6</option><option>7</option><option>8</option>
+      </select>
+    </label>
+    <label class="ctrl">Mode
+      <select id="mode">
+        <option value="alpha" selected>Alphabet</option>
+        <option value="num">Number</option>
+      </select>
+    </label>
+    <label class="ctrl">Shuffle
+      <span class="switch"><input type="checkbox" id="shuffle" checked><span class="slider"></span></span>
+    </label>
+    <label class="ctrl">Red/Black
+      <span class="switch"><input type="checkbox" id="visual"><span class="slider"></span></span>
+    </label>
+    <label class="ctrl">Dot
+      <span class="switch"><input type="checkbox" id="fix" checked><span class="slider"></span></span>
+    </label>
+  </div>
+
+  <div id="status">
+    <div id="time">0.00</div>
+    <div id="best">Best: <b>—</b></div>
+  </div>
+
+  <div id="target"><span id="targetPrefix"></span><span id="targetChar"></span>&nbsp;</div>
+
+  <div id="gridwrap">
+    <div id="grid"></div>
+    <div id="dot" class="on"></div>
+  </div>
+
+  <button id="found">Start</button>
+</div>
+<script>
+(function () {
+  "use strict";
+  var els = {
+    size: document.getElementById("size"),
+    mode: document.getElementById("mode"),
+    shuffle: document.getElementById("shuffle"),
+    visual: document.getElementById("visual"),
+    fix: document.getElementById("fix"),
+    targetPrefix: document.getElementById("targetPrefix"),
+    targetChar: document.getElementById("targetChar"),
+    time: document.getElementById("time"),
+    best: document.getElementById("best"),
+    gridwrap: document.getElementById("gridwrap"),
+    grid: document.getElementById("grid"),
+    dot: document.getElementById("dot"),
+    found: document.getElementById("found")
+  };
+
+  var ALPHA_U = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var ALPHA_L = "abcdefghijklmnopqrstuvwxyz";
+
+  // Generate the label for a given 0-based sequence index in alphabet mode.
+  // 0-25 -> A..Z, 26-51 -> a..z, 52+ -> Aa, Ab, ... Az, Ba, ...
+  function alphaLabel(i) {
+    if (i < 26) return ALPHA_U[i];
+    if (i < 52) return ALPHA_L[i - 26];
+    var j = i - 52;
+    return ALPHA_U[Math.floor(j / 26)] + ALPHA_L[j % 26];
+  }
+
+  // Build the array of labels (length = count) for the current mode.
+  function buildLabels(count, mode) {
+    var arr = [];
+    for (var i = 0; i < count; i++) {
+      arr.push(mode === "num" ? String(i + 1) : alphaLabel(i));
+    }
+    return arr;
+  }
+
+  function shuffleInPlace(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  // ---- State ----
+  var state = {
+    n: 5,            // grid dimension
+    mode: "alpha",
+    labels: [],      // the unique labels for this round (sequence order)
+    order: [],       // current placement: order[cellIndex] = labelIndex
+    targetIdx: 0,    // index into labels of the current target
+    cells: [],       // cell DOM elements
+    running: false,  // is a timed round in progress
+    startTime: 0,    // performance.now() at game start
+    timerId: null,   // rAF id for the live timer
+    bests: {}        // best time per "n|mode" key (ms)
+  };
+
+  // ---- Best-time persistence ----
+  var STORE_KEY = "schulteBests";
+  function loadBests() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      state.bests = raw ? JSON.parse(raw) : {};
+    } catch (e) { state.bests = {}; }
+  }
+  function saveBests() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state.bests)); } catch (e) {}
+  }
+  function bestKey() { return state.n + "|" + state.mode; }
+
+  function fmt(ms) {
+    var total = ms / 1000;
+    if (total < 60) return total.toFixed(2);
+    var m = Math.floor(total / 60);
+    var s = total - m * 60;
+    return m + ":" + (s < 10 ? "0" : "") + s.toFixed(2);
+  }
+  function renderBest() {
+    var b = state.bests[bestKey()];
+    els.best.innerHTML = "Best: <b>" + (b == null ? "—" : fmt(b)) + "</b>";
+  }
+
+  // Rebuild the grid DOM for a new size, return to idle (not started).
+  function reset() {
+    state.n = parseInt(els.size.value, 10);
+    state.mode = els.mode.value;
+    var count = state.n * state.n;
+    state.labels = buildLabels(count, state.mode);
+    state.targetIdx = 0;
+
+    // (re)create cells
+    els.grid.style.gridTemplateColumns = "repeat(" + state.n + ", 1fr)";
+    els.grid.style.gridTemplateRows = "repeat(" + state.n + ", 1fr)";
+    els.grid.innerHTML = "";
+    state.cells = [];
+    for (var c = 0; c < count; c++) {
+      var d = document.createElement("div");
+      d.className = "cell";
+      els.grid.appendChild(d);
+      state.cells.push(d);
+    }
+    placeLabels(true);   // initial placement always shuffled
+    sizeGrid();
+    goIdle();
+  }
+
+  // Enter the idle state: timer stopped/zeroed, blank target, Start button.
+  function goIdle() {
+    stopTimer();
+    state.running = false;
+    state.targetIdx = 0;
+    els.time.textContent = "0.00";
+    els.found.textContent = "Start";
+    updateTarget();
+    renderBest();
+  }
+
+  // Begin a timed round.
+  function startGame() {
+    state.running = true;
+    state.targetIdx = 0;
+    placeLabels(true);          // fresh shuffle for the round
+    els.found.textContent = "Found";
+    updateTarget();
+    state.startTime = performance.now();
+    tick();
+  }
+
+  // Assign labels to cells. If doShuffle, randomize positions.
+  function placeLabels(doShuffle) {
+    var count = state.labels.length;
+    if (doShuffle || state.order.length !== count) {
+      state.order = [];
+      for (var i = 0; i < count; i++) state.order.push(i);
+      shuffleInPlace(state.order);
+    }
+    for (var k = 0; k < count; k++) {
+      state.cells[k].textContent = state.labels[state.order[k]];
+    }
+    applyColors();
+  }
+  // Red/Black visual mode coloring (re-randomized on each call).
+  function applyColors() {
+    var on = els.visual.checked;
+    for (var k = 0; k < state.cells.length; k++) {
+      var cell = state.cells[k];
+      if (!on) {
+        cell.style.background = "#fff";
+        cell.style.color = "#000";
+      } else if (Math.random() < 0.5) {
+        cell.style.background = "#d9171f"; // red bg, black text
+        cell.style.color = "#000";
+      } else {
+        cell.style.background = "#111";    // black bg, white text
+        cell.style.color = "#fff";
+      }
+    }
+  }
+
+  function updateTarget() {
+    if (state.running) {
+      els.targetPrefix.textContent = "Find: ";
+      els.targetChar.textContent = state.labels[state.targetIdx];
+    } else {
+      els.targetPrefix.textContent = "";
+      els.targetChar.textContent = "";   // blank until Start is pressed
+    }
+  }
+
+  // Size the grid to the largest square fitting gridwrap, set font size.
+  function sizeGrid() {
+    var W = els.gridwrap.clientWidth;
+    var H = els.gridwrap.clientHeight;
+    if (W <= 0 || H <= 0) return;
+    var side = Math.floor(Math.min(W, H));
+    els.grid.style.width = side + "px";
+    els.grid.style.height = side + "px";
+
+    // longest label length affects font sizing
+    var maxLen = 1;
+    for (var i = 0; i < state.labels.length; i++) {
+      if (state.labels[i].length > maxLen) maxLen = state.labels[i].length;
+    }
+    var gap = 4;
+    var cellSize = (side - gap * 2 - gap * (state.n - 1)) / state.n;
+    // padding inside cell scales with grid size
+    var pad = Math.max(8, Math.min(14, cellSize * 0.18));
+    var avail = cellSize - pad * 2;
+    // approx char width ~0.6em; size font to fit maxLen chars and height
+    var fByW = (avail / (maxLen * 0.62));
+    var fByH = avail;
+    var fs = Math.max(10, Math.floor(Math.min(fByW, fByH)));
+    els.grid.style.fontSize = fs + "px";
+  }
+  // ---- Timer ----
+  function tick() {
+    els.time.textContent = fmt(performance.now() - state.startTime);
+    state.timerId = requestAnimationFrame(tick);
+  }
+  function stopTimer() {
+    if (state.timerId) { cancelAnimationFrame(state.timerId); state.timerId = null; }
+  }
+
+  // Finish a round: stop timer, record best, freeze elapsed, return to idle.
+  function finishGame() {
+    var elapsed = performance.now() - state.startTime;
+    stopTimer();
+    state.running = false;
+    els.time.textContent = fmt(elapsed);   // freeze final time on display
+
+    var key = bestKey();
+    var prev = state.bests[key];
+    var isNew = prev == null || elapsed < prev;
+    if (isNew) { state.bests[key] = elapsed; saveBests(); }
+    renderBest();
+    if (isNew) {
+      els.best.classList.add("flash");
+      setTimeout(function () { els.best.classList.remove("flash"); }, 1500);
+    }
+
+    els.found.textContent = "Start";
+    updateTarget();   // blank the target again
+  }
+
+  // Tap the action button: Start when idle, Found while running.
+  function onAction() {
+    if (!state.running) { startGame(); return; }
+    if (state.targetIdx >= state.labels.length - 1) {
+      finishGame();               // last target found -> done
+      return;
+    }
+    state.targetIdx++;
+    if (els.shuffle.checked) {
+      placeLabels(true);          // reshuffle positions + recolor
+    } else if (els.visual.checked) {
+      applyColors();              // keep positions, but recolor
+    }
+    updateTarget();
+  }
+
+  function applyDot() {
+    els.dot.classList.toggle("on", els.fix.checked);
+  }
+
+  // ---- Events ----
+  els.size.addEventListener("change", reset);
+  els.mode.addEventListener("change", reset);
+  els.fix.addEventListener("change", applyDot);
+  els.visual.addEventListener("change", function () { applyColors(); });
+
+  // Use touchstart for zero-lag response on iOS, fall back to click.
+  var touched = false;
+  els.found.addEventListener("touchstart", function (e) {
+    touched = true; onAction();
+  }, { passive: true });
+  els.found.addEventListener("click", function () {
+    if (touched) { touched = false; return; }
+    onAction();
+  });
+
+  var raf = null;
+  function onResize() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(sizeGrid);
+  }
+  window.addEventListener("resize", onResize);
+  window.addEventListener("orientationchange", onResize);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onResize);
+  }
+
+  // ---- Init ----
+  loadBests();
+  applyDot();
+  reset();
+})();
+
+
+</script>
+</body>
+</html>
+
