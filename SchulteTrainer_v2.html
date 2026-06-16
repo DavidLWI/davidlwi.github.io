@@ -77,6 +77,7 @@ html, body {
   flex: 0 0 auto; text-align: center; color: #000;
   font-weight: 700; line-height: 1.1;
   font-size: clamp(22px, 6vw, 40px);
+  margin: 6px 0 14px;
 }
 #targetChar { color: #007aff; }
 
@@ -104,8 +105,12 @@ html, body {
 }
 #dot.on { display: block; }
 
+#actions {
+  flex: 0 0 auto; margin-top: 18px;
+  display: flex; justify-content: center; align-items: stretch; gap: 10px;
+}
 #found {
-  flex: 0 0 auto; min-height: 52px; margin-top: 16px;
+  flex: 0 0 50%; min-height: 52px;
   border: none; border-radius: 14px;
   background: #007aff; color: #fff;
   font-size: 20px; font-weight: 700;
@@ -113,6 +118,15 @@ html, body {
   cursor: pointer;
 }
 #found:active { transform: scale(.97); background: #0062cc; }
+#restart {
+  align-self: flex-start; min-height: 36px; padding: 0 16px;
+  border: none; border-radius: 10px;
+  background: #e4e4e9; color: #333;
+  font-size: 15px; font-weight: 600;
+  transition: transform .06s ease, background .12s ease;
+  cursor: pointer;
+}
+#restart:active { transform: scale(.97); background: #d0d0d5; }
 </style>
 </head>
 <body>
@@ -141,6 +155,8 @@ html, body {
     </label>
   </div>
 
+  <button id="restart">Restart</button>
+
   <div id="status">
     <div id="time">0.00</div>
     <div id="best">Best: <b>—</b></div>
@@ -153,7 +169,9 @@ html, body {
     <div id="dot" class="on"></div>
   </div>
 
-  <button id="found">Start</button>
+  <div id="actions">
+    <button id="found">Start</button>
+  </div>
 </div>
 <script>
 (function () {
@@ -171,7 +189,8 @@ html, body {
     gridwrap: document.getElementById("gridwrap"),
     grid: document.getElementById("grid"),
     dot: document.getElementById("dot"),
-    found: document.getElementById("found")
+    found: document.getElementById("found"),
+    restart: document.getElementById("restart")
   };
 
   var ALPHA_U = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -403,6 +422,12 @@ html, body {
     els.dot.classList.toggle("on", els.fix.checked);
   }
 
+  // Restart: abandon any current round and begin a fresh timed game.
+  function onRestart() {
+    stopTimer();
+    startGame();
+  }
+
   // ---- Events ----
   els.size.addEventListener("change", reset);
   els.mode.addEventListener("change", reset);
@@ -410,14 +435,16 @@ html, body {
   els.visual.addEventListener("change", function () { applyColors(); });
 
   // Use touchstart for zero-lag response on iOS, fall back to click.
-  var touched = false;
-  els.found.addEventListener("touchstart", function (e) {
-    touched = true; onAction();
-  }, { passive: true });
-  els.found.addEventListener("click", function () {
-    if (touched) { touched = false; return; }
-    onAction();
-  });
+  function bindTap(el, fn) {
+    var t = false;
+    el.addEventListener("touchstart", function () { t = true; fn(); }, { passive: true });
+    el.addEventListener("click", function () {
+      if (t) { t = false; return; }
+      fn();
+    });
+  }
+  bindTap(els.found, onAction);
+  bindTap(els.restart, onRestart);
 
   var raf = null;
   function onResize() {
