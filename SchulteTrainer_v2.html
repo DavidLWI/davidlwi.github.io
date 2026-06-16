@@ -35,7 +35,7 @@ html, body {
 }
 #controls {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 8px 14px; flex: 0 0 auto;
+  gap: 8px 14px; flex: 0 0 auto; margin-top: 14px;
 }
 .ctrl { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #333; }
 .ctrl select {
@@ -131,6 +131,24 @@ html, body {
 </head>
 <body>
 <div id="app">
+  <button id="restart">Restart</button>
+
+  <div id="status">
+    <div id="time">0.00</div>
+    <div id="best">Best: <b>—</b></div>
+  </div>
+
+  <div id="target"><span id="targetPrefix"></span><span id="targetChar"></span>&nbsp;</div>
+
+  <div id="gridwrap">
+    <div id="grid"></div>
+    <div id="dot" class="on"></div>
+  </div>
+
+  <div id="actions">
+    <button id="found">Start</button>
+  </div>
+
   <div id="controls">
     <label class="ctrl">Size
       <select id="size">
@@ -153,24 +171,6 @@ html, body {
     <label class="ctrl">Dot
       <span class="switch"><input type="checkbox" id="fix" checked><span class="slider"></span></span>
     </label>
-  </div>
-
-  <button id="restart">Restart</button>
-
-  <div id="status">
-    <div id="time">0.00</div>
-    <div id="best">Best: <b>—</b></div>
-  </div>
-
-  <div id="target"><span id="targetPrefix"></span><span id="targetChar"></span>&nbsp;</div>
-
-  <div id="gridwrap">
-    <div id="grid"></div>
-    <div id="dot" class="on"></div>
-  </div>
-
-  <div id="actions">
-    <button id="found">Start</button>
   </div>
 </div>
 <script>
